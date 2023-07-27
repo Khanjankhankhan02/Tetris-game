@@ -1,0 +1,107 @@
+import pygame
+import random
+
+# Initialize the game
+pygame.init()
+
+# Set the window dimensions
+window_width, window_height = 800, 600
+window = pygame.display.set_mode((window_width, window_height))
+pygame.display.set_caption("Tetris")
+
+# Set the game variables
+block_size = 30
+rows = window_height // block_size
+columns = window_width // block_size
+clock = pygame.time.Clock()
+score = 0
+
+# Set the colors
+black = (0, 0, 0)
+white = (255, 255, 255)
+red = (255, 0, 0)
+green = (0, 255, 0)
+blue = (0, 0, 255)
+yellow = (255, 255, 0)
+orange = (255, 165, 0)
+cyan = (0, 255, 255)
+purple = (128, 0, 128)
+
+# Define the shapes for the Tetrominoes
+tetrominoes = [
+    [[1, 1, 1, 1]],
+    [[1, 1], [1, 1]],
+    [[1, 0, 0], [1, 1, 1]],
+    [[0, 0, 1], [1, 1, 1]],
+    [[0, 1, 1], [1, 1, 0]],
+    [[1, 1, 0], [0, 1, 1]],
+    [[1, 1, 1], [0, 1, 0]]
+]
+
+# Create a grid to track the state of the game
+grid = [[black] * columns for _ in range(rows)]
+
+# Function to draw the grid and current shape
+def draw_grid():
+    for row in range(rows):
+        for col in range(columns):
+            pygame.draw.rect(window, grid[row][col], (col * block_size, row * block_size, block_size, block_size))
+    pygame.display.update()
+
+# Function to create a new Tetromino shape
+def create_tetromino():
+    tetromino = random.choice(tetrominoes)
+    tetromino_color = random.choice([red, green, blue, yellow, orange, cyan, purple])
+    return tetromino, tetromino_color
+
+# Function to check if the current position is within the grid and is not colliding with other shapes
+def is_valid_move(tetromino, tetromino_row, tetromino_col):
+    for row in range(len(tetromino)):
+        for col in range(len(tetromino[row])):
+            if tetromino[row][col] == 1:
+                if tetromino_row + row >= rows or tetromino_col + col < 0 or tetromino_col + col >= columns or grid[tetromino_row + row][tetromino_col + col] != black:
+                    return False
+    return True
+
+# Function to update the grid with the current shape
+def update_grid(tetromino, tetromino_row, tetromino_col, tetromino_color):
+    for row in range(len(tetromino)):
+        for col in range(len(tetromino[row])):
+            if tetromino[row][col] != 0:
+                grid[tetromino_row + row][tetromino_col + col] = tetromino_color
+
+# Function to check and clear completed rows
+def check_completed_rows():
+    completed_rows = []
+    for row in range(rows):
+        if black not in grid[row]:
+            completed_rows.append(row)
+    for row in completed_rows:
+        del grid[row]
+        grid.insert(0, [black] * columns)
+    return len(completed_rows)
+
+# Function to display the game over message
+def game_over_message():
+    font = pygame.font.SysFont(None, 50)
+    game_over_text = font.render("Game Over", True, red)
+    window.blit(game_over_text, (window_width / 2 - game_over_text.get_width() / 2, window_height / 2 - game_over_text.get_height() / 2))
+    pygame.display.update()
+    pygame.time.delay(2000)
+
+# Function to run the game loop
+def game_loop():
+    tetromino, tetromino_color = create_tetromino()
+    tetromino_row = 0
+    tetromino_col = columns // 2 - len(tetromino[0]) // 2
+    game_over = False
+
+    while not game_over:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game_over = True
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    if
